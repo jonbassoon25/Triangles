@@ -2,3 +2,5 @@
 /Makefile
 triangle
 /.vscode
+simple_triangle.app
+shaded_triangle.app
