@@ -36,7 +36,7 @@ int main(void) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // MacOS only supports the core profile
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-	GLFWwindow* window = glfwCreateWindow(480, 480, "Simple Triangle", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(480, 480, "Shaded Triangle", NULL, NULL);
 
 	if (!window) {
 		glfwTerminate();
