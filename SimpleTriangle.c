@@ -57,13 +57,13 @@ int main(void) {
 	};
 
 	// Generate and Populate a Vertex Buffer Object (VBO)
-	GLuint vboIdentifier = 0;
+	GLuint vboIdentifier;
 	glGenBuffers(1, &vboIdentifier);
 	glBindBuffer(GL_ARRAY_BUFFER, vboIdentifier);
 	glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), triangleVertices, GL_STATIC_DRAW);
 
 	// Generate and Bind a Vertex Array Object (VAO) to the VBO
-	GLuint vaoIdentifier = 0;
+	GLuint vaoIdentifier;
 	glGenVertexArrays(1, &vaoIdentifier);
 	glBindVertexArray(vaoIdentifier);
 	glEnableVertexAttribArray(0); // We only have 1 VBO and it will be the 0th attribute
