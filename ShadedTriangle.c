@@ -36,7 +36,7 @@ int main(void) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // MacOS only supports the core profile
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-	GLFWwindow* window = glfwCreateWindow(240, 240, "Simple Triangle", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(480, 480, "Simple Triangle", NULL, NULL);
 
 	if (!window) {
 		glfwTerminate();
@@ -55,46 +55,68 @@ int main(void) {
 		 0.5f, -0.5f, 0.0f,
 		-0.5f, -0.5f, 0.0f
 	};
+	float triangleColors[9] = {
+		1.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 1.0f
+	};
 
-	// Generate and Populate a Vertex Buffer Object (VBO)
-	GLuint vboIdentifier = 0;
-	glGenBuffers(1, &vboIdentifier);
-	glBindBuffer(GL_ARRAY_BUFFER, vboIdentifier);
+	// Generate and Populate a Vertex Buffer Object (VBO) for points
+	GLuint pointsVBO_ID;
+	glGenBuffers(1, &pointsVBO_ID);
+	glBindBuffer(GL_ARRAY_BUFFER, pointsVBO_ID);
 	glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), triangleVertices, GL_STATIC_DRAW);
 
+	// Generate and Populate a VBO for vertex colors
+	GLuint colorsVBO_ID;
+	glGenBuffers(1, &colorsVBO_ID);
+	glBindBuffer(GL_ARRAY_BUFFER, colorsVBO_ID);
+	glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), triangleColors, GL_STATIC_DRAW);
+
 	// Generate and Bind a Vertex Array Object (VAO) to the VBO
-	GLuint vaoIdentifier = 0;
+	GLuint vaoIdentifier;
 	glGenVertexArrays(1, &vaoIdentifier);
 	glBindVertexArray(vaoIdentifier);
-	glEnableVertexAttribArray(0); // We only have 1 VBO and it will be the 0th attribute
-	glBindBuffer(GL_ARRAY_BUFFER, vboIdentifier);
+	
+	// Add attributes to the VAO
+	glBindBuffer(GL_ARRAY_BUFFER, pointsVBO_ID);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glBindBuffer(GL_ARRAY_BUFFER, colorsVBO_ID);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+	// Enable the attributes
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
 
 	// Load vertex shader script
 	char vertShaderBuffer[256] = {'\0'};
-	FILE* vertFile = fopen("simpleTriangle.vert", "r");
+	FILE* vertFile = fopen("shadedTriangle.vert", "r");
 	if (!vertFile) {
-		perror("simpleTriangle.vert could not be opened.");
+		perror("shadedTriangle.vert could not be opened.");
 		exit(EXIT_FAILURE);
 	}
 	fread(vertShaderBuffer, sizeof(char), 255, vertFile);
 	if (strlen(vertShaderBuffer) == 255) {
-		perror("Too many characters in simpleTriangle.vert. Increase buffer size.");
+		perror("Too many characters in shadedTriangle.vert. Increase buffer size.");
 		exit(EXIT_FAILURE);
+	} else {
+		printf("%lu/254 characters used in shadedTriangle.vert.\n", strlen(vertShaderBuffer));
 	}
 	fclose(vertFile);
 
 	// Load fragment shader script
 	char fragShaderBuffer[256] = {'\0'};
-	FILE* fragFile = fopen("simpleTriangle.frag", "r");
+	FILE* fragFile = fopen("shadedTriangle.frag", "r");
 	if (!fragFile) {
-		perror("simpleTriangle.frag could not be opened.");
+		perror("shadedTriangle.frag could not be opened.");
 		exit(EXIT_FAILURE);
 	}
 	fread(fragShaderBuffer, sizeof(char), 255, fragFile);
 	if (strlen(fragShaderBuffer) == 255) {
-		perror("Too many characters in simpleTriangle.frag. Increase buffer size.");
+		perror("Too many characters in shadedTriangle.frag. Increase buffer size.");
 		exit(EXIT_FAILURE);
+	} else {
+		printf("%lu/254 characters used in shadedTriangle.frag.\n", strlen(fragShaderBuffer));
 	}
 	fclose(fragFile);
 
@@ -114,6 +136,8 @@ int main(void) {
 	GLuint shaderProgramID = glCreateProgram();
 	glAttachShader(shaderProgramID, fsIdentifier);
 	glAttachShader(shaderProgramID, vsIdentifier);
+	glBindAttribLocation(shaderProgramID, 0, "vertex_position");
+	glBindAttribLocation(shaderProgramID, 1, "vertex_color");
 	glLinkProgram(shaderProgramID);
 
 
